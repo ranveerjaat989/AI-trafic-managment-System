@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Traffic Light Controler</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        video, canvas { border: 2px solid black; margin: 10px; }
+        #counter { font-size: 20px; margin-top: 10px; font-weight: bold; }
+        #trackList { margin-top: 10px; font-size: 18px; text-align: left; display: inline-block; }
+        button { padding: 10px; font-size: 16px; margin-top: 10px; cursor: pointer; background-color: #28a745;  border: none; }
+    </style>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="heading">
+
+      <h1>AI Traffic Management System</h1>
+      <div>
+        <i class="fa-solid fa-bars"></i>
+      </div>
+    </div>
+    <div class="main">
+     
+      <div id="road-collecation">
+        <!-- ----------------Light 1 -->
+        <div class="road" id="road1">
+          <p>Light 1</p>
+          <div>
+            <p id="light1-timer">00:00</p>
+          </div>
+          <div class="road1-light red-light lights" id="road1-red"></div>
+          <div class="road1-light yellow-light lights" id="road1-yellow"></div>
+          <div class="road1-light green-light lights" id="road1-green"></div>
+        </div>
+
+        <!-- ----------------Light 2 -->
+        <div class="road" id="road2">
+          <p>Light 2</p>
+          <div>
+            <p id="light2-timer">00:00</p>
+          </div>
+          <div class="road2-light red-light lights" id="road2-red"></div>
+          <div class="road2-light yellow-light lights" id="road2-yellow"></div>
+          <div class="road2-light green-light lights" id="road2-green"></div>
+        </div>
+
+        <!-- ----------------Light 3 -->
+        <div class="road" id="road3">
+          <p>Light 3</p>
+          <div>
+            <p id="light3-timer">00:00</p>
+          </div>
+          <div class="road3-light red-light lights" id="road3-red"></div>
+          <div class="road3-light yellow-light lights" id="road3-yellow"></div>
+          <div class="road3-light green-light lights" id="road3-green"></div>
+        </div>
+
+        <!-- ----------------Light 4 -->
+        <div class="road" id="road4">
+          <p>Light 4</p>
+          <div>
+            <p id="light4-timer">00:00</p>
+          </div>
+          <div class="road4-light red-light lights" id="road4-red"></div>
+          <div class="road4-light yellow-light lights" id="road4-yellow"></div>
+          <div class="road4-light green-light lights" id="road4-green"></div>
+        </div>
+      </div>
+      <!-- Light auto and manuls controls elements -->
+      <div id="road-controls">
+        <h2>AI trafic controler</h2>
+        <div class="auto-manual">
+          <button onclick="auto()" class="buttons btn-auto-manual " id="auto-button">Auto</button>
+          <button onclick="manual()" class="buttons btn-auto-manual" id="manual-button">Manual</button>
+        </div>
+        <div id="manual-controls">
+          <!-- Set all lights are Green, yellow and red -->
+          <h3 class="manual-text">All lights are</h3>
+          <div>
+            <button onclick="allLightAreGreen()" class="buttons btns-green">Lights are Green</button>
+            <button onclick="all_lights_yellow()" class="buttons btns-yellow">Lights are Yellow</button>
+            <button onclick="allLightAreRed()" class="buttons btns-red">Lights are Red</button>
+          </div>
+         
+            <!-- Set  lights are green -->
+          <div class="manual-green">
+            <h3 class="manual-text">Light are green</h3>
+            <div>
+              <button onclick="light1Green()" class="buttons btn-green-manual" id="btn_light1green" >Light 1 Green</button>
+              <button onclick="light2Green()" class="buttons btn-green-manual" id="btn_light2green" >Light 2 Green</button>
+              <button onclick="light3Green()" class="buttons btn-green-manual" id="btn_light3green" >Light 3 Green</button>
+              <button onclick="light4Green()" class="buttons btn-green-manual" id="btn_light4green">Light 4 Green</button>
+            </div>
+
+            <!-- Set lights are yellow -->
+          </div>
+          <div class="manual-yellow">
+            <h3 class="manual-text">Light are Yellow</h3>
+            <div>
+              <button onclick="light1Yellow()" id="btn_light1yellow" class="buttons  btn-yellow-manual">Light 1 Yellow</button>
+              <button onclick="light2Yellow()" id="btn_light2yellow" class="buttons  btn-yellow-manual">Light 2 Yellow</button>
+              <button onclick="light3Yellow()" id="btn_light3yellow" class="buttons  btn-yellow-manual">Light 3 Yellow</button>
+              <button onclick="light4Yellow()" id="btn_light4yellow" class="buttons  btn-yellow-manual">Light 4 Yellow</button>
+            </div>
+
+           <!-- Set lights are red -->
+          </div>
+          <div class="manual-red">
+            <h3 class="manual-text">Light are Red</h3>
+            <div>
+              <button onclick="light1Red()" id="btn_light1Red" class="buttons btn-red-manual">Light 1 Red</button>
+              <button onclick="light2Red()" id="btn_light2Red" class="buttons btn-red-manual">Light 2 Red</button>
+              <button onclick="light3Red()" id="btn_light3Red" class="buttons btn-red-manual">Light 3 Red</button>
+              <button onclick="light4Red()" id="btn_light4Red" class="buttons btn-red-manual">Light 4 Red</button>
+            </div>
+          
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+
+<!-- Live camera and and coco-ssd related elements -->
+    <div class="coco-ssd">
+        <h1 id="live-vehicles-detection">Live Vehicles Detection </h1>
+        <div class="detection-tag">
+          <div class="vidoe-tag">
+            <video id="video" width="640" height="480" autoplay></video>
+  
+          </div>
+          <div class="canvas-tag">
+            <canvas id="canvas" width="640" height="480"></canvas>
+          </div>
+        </div>
+        <div class="bottom-detection-tag">
+          <div id="counter">Total Vehicles: 0</div>
+          <div>
+            <button class="button" onclick="captureAndDetect()">Capture & Detect</button>  
+          </div>
+          
+        </div>
+      
+       
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
+
